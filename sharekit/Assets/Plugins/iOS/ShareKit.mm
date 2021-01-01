@@ -22,6 +22,10 @@ extern "C" {
     
         if(floorf(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_7_1) {
             activityView.popoverPresentationController.sourceView = UnityGetGLViewController().view;
+            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                activityView.popoverPresentationController.sourceRect = CGRectMake(UnityGetGLViewController().view.bounds.size.width/2, UnityGetGLViewController().view.bounds.size.height/2, 0, 0);
+                activityView.popoverPresentationController.permittedArrowDirections = 0;
+            }
         }
     
         [UnityGetGLViewController() presentViewController:activityView animated:YES completion:nil];
