@@ -14,6 +14,8 @@ public class PostGenerateGradleAndroidProject : IPostGenerateGradleAndroidProjec
 
 	public void OnPostGenerateGradleAndroidProject(string path)
 	{
+		GenerateGradleProperties(path);
+
 		var androidManifest = new AndroidManifest(GetManifestPath(path));
 
 		if (EditManifest(androidManifest))
@@ -36,7 +38,7 @@ public class PostGenerateGradleAndroidProject : IPostGenerateGradleAndroidProjec
 			attributes: new Dictionary<string, string>());
 		changed |= androidManifest.AddUsesPermission("android.permission.WRITE_EXTERNAL_STORAGE");
 
-		var providerName = "android.support.v4.content.FileProvider";
+		var providerName = "androidx.core.content.FileProvider";
 		changed |= androidManifest.AddProvider(providerName, attributes: new Dictionary<string, string>
 		{
 			{"authorities", Application.identifier + ".fileprovider"},
@@ -50,6 +52,23 @@ public class PostGenerateGradleAndroidProject : IPostGenerateGradleAndroidProjec
 			});
 
 		return changed;
+	}
+
+	private static void GenerateGradleProperties(string path)
+	{
+		var gradlePropertiesFile = Path.Combine(path, "gradle.properties");
+		if (File.Exists(gradlePropertiesFile))
+		{
+			Debug.Log($"REMOVE FILE: {gradlePropertiesFile}");
+			File.Delete(gradlePropertiesFile);
+		}
+
+		var writer = File.CreateText(gradlePropertiesFile);
+		writer.WriteLine("org.gradle.jvmargs=-Xmx4096M");
+		writer.WriteLine("android.useAndroidX=true");
+		writer.WriteLine("android.enableJetifier=true");
+		writer.Flush();
+		writer.Close();
 	}
 }
 
